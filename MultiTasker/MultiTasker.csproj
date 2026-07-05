@@ -1,0 +1,134 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Target Name="ValidateBattleTechGameDir" Condition="'$(BattleTechGameDir)' == '' Or !Exists('$(BattleTechGameDir)')">
+    <Error Text="BattleTechGameDir variable not set properly" />
+  </Target>
+
+  <PropertyGroup Condition="'$(DeployedModPath)' == '' And Exists('$(BattleTechGameDir)\Mods\Core\MultiTasker')">
+    <!-- Modpack -->
+    <DeployedModPath>$(BattleTechGameDir)\Mods\Core\MultiTasker</DeployedModPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DeployedModPath)' == '' And Exists('$(BattleTechGameDir)\Mods\MultiTasker')">
+    <!-- flat dir -->
+    <DeployedModPath>$(BattleTechGameDir)\Mods\MultiTasker</DeployedModPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblySearchPaths>
+      $(ReferencePath);
+      {HintPathFromItem};
+      $(BattleTechGameDir)\BattleTech_Data\Managed
+    </AssemblySearchPaths>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+
+    <AssemblyTitle>MultiTasker</AssemblyTitle>
+    <Product>MultiTasker</Product>
+    <Copyright>Copyright © 2026</Copyright>
+    <AssemblyVersion>0.1.0</AssemblyVersion>
+    <FileVersion>0.1.0</FileVersion>
+    <LangVersion>11</LangVersion>
+  </PropertyGroup>
+
+  <Target Name="AfterBuildMigrated" AfterTargets="CopyFilesToOutputDirectory">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BattleTechGameDir)\Mods\Core\MultiTasker" Condition="'$(BattleTechGameDir)' != '' And Exists('$(BattleTechGameDir)\Mods\Core\MultiTasker')" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BattleTechGameDir)\Mods_CBDE\Core\MultiTasker" Condition="'$(BattleTechGameDir)' != '' And Exists('$(BattleTechGameDir)\Mods_CBDE\Core\MultiTasker')" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(RogueTechRepo)\Core\MultiTasker" Condition="'$(RogueTechRepo)' != '' And Exists('$(RogueTechRepo)\Core\MultiTasker')" />
+  </Target>
+
+  <PropertyGroup>
+    <!-- avoids IgnoresAccessChecksToAttribute warnings -->
+    <PublicizerRuntimeStrategies>Unsafe</PublicizerRuntimeStrategies>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Krafs.Publicizer" Version="2.3.0" />
+    <Publicize Include="Assembly-CSharp;UnityEngine.UI" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HarmonyX" Version="2.16.1">
+      <PrivateAssets>all</PrivateAssets>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+
+    <Reference Include="Assembly-CSharp">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="InControl">
+      <Private>False</Private>
+    </Reference>
+<!--     <Reference Include="JWTweaks">
+      <HintPath>$(DeployedModPath)\..\JWTweaks\JWTweaks.dll</HintPath>
+      <Private>False</Private>
+    </Reference> -->
+    <Reference Include="ModTek">
+      <HintPath>$(DeployedModPath)\..\ModTek\lib\ModTek.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <Private>False</Private>
+    </Reference>
+        <Reference Include="UnityEngine">
+      <Private>False</Private>
+    </Reference>
+<!--     <Reference Include="Unity.TextMeshPro">
+      <Private>False</Private>
+    </Reference>
+
+    <Reference Include="UnityEngine.AnimationModule">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainModule">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <Private>False</Private>
+    </Reference> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Objects\" />
+    <Folder Include="Sequence\" />
+    <Folder Include="UI\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  
+</Project>

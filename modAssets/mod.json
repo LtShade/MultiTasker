@@ -1,0 +1,16 @@
+{
+    "Name": "MultiTasker",
+    "Enabled": true,
+    "Hidden": true,
+    "Version": "0.1.0",
+    "Description": "Allows for various levels of parallel mech repair.",
+    "Author": "LtShade",
+    "Website": "https://github.com/LtShade/MultiTasker",
+    "Contact": "",
+    "DLL": "MultiTasker.dll",
+    "DLLEntryPoint" : "MultiTasker.Mod.Init",
+    "DependsOn" : [ ],
+    "ConflictsWith" : [ ],
+    "CustomResourceTypes": [ ],
+    "Manifest" : [ ]
+}
