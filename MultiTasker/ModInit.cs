@@ -1,7 +1,6 @@
 using ModTek.Public;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -66,13 +65,9 @@ namespace MultiTasker
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), HarmonyPackage);
         }
 
-        public static void FinishedLoading(Dictionary<string, Dictionary<string, VersionManifestEntry>> customResources)
+public static void FinishedLoading()
         {
             Mod.Log.Trace?.Log("==== ModInit::FinishedLoading invoked.");
         }
-
-
-
-
     }
 }

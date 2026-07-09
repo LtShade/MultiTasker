@@ -83,9 +83,16 @@
         <Reference Include="UnityEngine">
       <Private>False</Private>
     </Reference>
-<!--     <Reference Include="Unity.TextMeshPro">
+    <Reference Include="UnityEngine.CoreModule">
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <Private>False</Private>
+    </Reference>
+<!--     
 
     <Reference Include="UnityEngine.AnimationModule">
       <Private>False</Private>
@@ -105,9 +112,7 @@
     <Reference Include="UnityEngine.TerrainModule">
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <Private>False</Private>
-    </Reference> -->
+ -->
   </ItemGroup>
 
   <ItemGroup>

@@ -9,8 +9,8 @@
     "Contact": "",
     "DLL": "MultiTasker.dll",
     "DLLEntryPoint" : "MultiTasker.Mod.Init",
-    "DependsOn" : [ ],
-    "ConflictsWith" : [ ],
+    "DependsOn" : ["JwTweaks" ],
+    "ConflictsWith" : ["RepairBays" ],
     "CustomResourceTypes": [ ],
     "Manifest" : [ ]
 }
