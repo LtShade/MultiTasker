@@ -11,8 +11,11 @@ namespace MultiTasker.Helper
         {
 
             //Set Efficiencies variable to populate what queue positions get which efficiencies
-            Dictionary<int, float> efficiencies = new Dictionary<int, float>();
-            
+            Dictionary<int, float> efficiencies = new Dictionary<int, float>
+            {
+                //Position 0 is always 100% efficiency
+                {0, 1}
+            };
             //Build out baseline parallel workers and their efficiencies
             foreach (ParallelRepairUpgrades upgrade in Mod.Config.RepairBays)
             {
