@@ -30,7 +30,7 @@ RepairBays[] - Array of objects that define a worker.
 - UpgradeID, string
   - ID of the dropship upgrade that enables this worker
 - BaseEfficiency, float
-  - 0-1 float to determine % of MechTech skill to apply to this worker; i.e. 0.5 == 50%
+  - 0-X float to determine % of MechTech skill to apply to this worker; i.e. 0.5 == 50%, 1.5 == 150% (but why!?)
   - Can be increassed in the BayEfficiencies array
 
 BayEfficiencies[] - Array of objects that outline what upgrades, if any, update the efficiency of a worker.
@@ -39,7 +39,7 @@ BayEfficiencies[] - Array of objects that outline what upgrades, if any, update 
 - UpgradeID, string
   - ID of the dropship upgrade that applies this change
 NewEfficiency, float
-  - 0-1 float to determine % of MechTech skill to apply to this worker; i.e. 0.5 == 50%
+  - 0-X float to determine % of MechTech skill to apply to this worker; i.e. 0.5 == 50%, 1.5 == 150%
   - Replaces BaseEfficiency value
 
 
