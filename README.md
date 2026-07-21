@@ -1,7 +1,7 @@
 # MultiTasker
 MultiTasker is inteded to enable the repair and refit of multiple mechs and vehicles at a time rather than one at a time; this increased capacity is gated behind defined dropship upgrades. This is accomplished by the *settings.json* laying out bonuses provided by specific upgrades. Furthermore, the rate at which repairs and refits can be made for subsequent parallel tasks is configurable as well if granularity is desired.
 
-Heavily borrows from UniversalDropshipSalesman because I liked the structure. Is it overkill for this thing? Probably. Do I care? No, I need the expose and practice.
+Heavily borrows from IceRaptor's mods because I liked the structure. Is it overkill for this thing? Probably. Do I care? No, I need the expose and practice.
 
 ## Assumptions
 - The first position in the workorder queue will **always** operate at 100%; if you want to affect baseline efficiency, change MechTech skill.
@@ -40,6 +40,7 @@ BayEfficiencies[] - Array of objects that outline what upgrades, if any, update 
   - ID of the dropship upgrade that applies this change
 NewEfficiency, float
   - 0-1 float to determine % of MechTech skill to apply to this worker; i.e. 0.5 == 50%
+  - Replaces BaseEfficiency value
 
 
 ## Goals
