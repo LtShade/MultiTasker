@@ -6,11 +6,11 @@
     "Description": "Allows for various levels of parallel mech repair.",
     "Author": "LtShade",
     "Website": "https://github.com/LtShade/MultiTasker",
-    "Contact": "",
+    "Contact": "Discord: ltshade",
     "DLL": "MultiTasker.dll",
     "DLLEntryPoint" : "MultiTasker.Mod.Init",
-    "DependsOn" : [ ],
-    "ConflictsWith" : [ ],
+    "DependsOn" : ["JwTweaks" ],
+    "ConflictsWith" : ["RepairBays"],
     "CustomResourceTypes": [ ],
     "Manifest" : [ ]
 }

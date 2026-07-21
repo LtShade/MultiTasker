@@ -1,3 +1,33 @@
 {
-    "Settings" : "empty"
+    "RepairBays":
+    [
+        {
+            "WorkerID" : 0,
+            "UpgradeID": "argo_mechBay1",
+            "BaseEfficiency": 1
+        },
+        {
+            "WorkerID" : 1,
+            "UpgradeID": "argo_mechBay2",
+            "BaseEfficiency": 0.5
+        },
+        {
+            "WorkerID" : 2,
+            "UpgradeID": "argo_mechBay3",
+            "BaseEfficiency": 0.5
+        }
+    ],
+    "BayEfficiencies":
+    [
+        {
+            "WorkerID" : 1,
+            "UpgradeID": "argo_mechBay_automation1",
+            "NewEfficiency": 1
+        },
+                {
+            "WorkerID" : 2,
+            "UpgradeID": "argo_mechBay_automation2",
+            "NewEfficiency": 1
+        }
+    ]
 }
