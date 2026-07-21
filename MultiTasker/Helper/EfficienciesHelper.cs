@@ -22,13 +22,13 @@ namespace MultiTasker.Helper
                 if(sgs.shipUpgrades.Any((ShipModuleUpgrade u) => u.Tags.Any((string t) => t.Contains(upgrade.UpgradeID))))
                 {
                     float eff = 0;
-                    if(efficiencies.TryGetValue(upgrade.ParallelPathID, out eff))
+                    if(efficiencies.TryGetValue(upgrade.WorkerID, out eff))
                     {
-                        efficiencies[upgrade.ParallelPathID] = Math.Max(eff, upgrade.BaseEfficiency);
+                        efficiencies[upgrade.WorkerID] = Math.Max(eff, upgrade.BaseEfficiency);
                     }
                     else
                     {
-                        efficiencies.Add(upgrade.ParallelPathID,upgrade.BaseEfficiency);
+                        efficiencies.Add(upgrade.WorkerID,upgrade.BaseEfficiency);
                     }
                 } 
             }
@@ -41,13 +41,13 @@ namespace MultiTasker.Helper
                 if(sgs.shipUpgrades.Any((ShipModuleUpgrade u) => u.Tags.Any((string t) => t.Contains(upgrade.UpgradeID))))
                 {
                     float eff = 0;
-                    if(efficiencies.TryGetValue(upgrade.ParallelPathID, out eff))
+                    if(efficiencies.TryGetValue(upgrade.WorkerID, out eff))
                     {
-                        efficiencies[upgrade.ParallelPathID] = Math.Max(eff, upgrade.NewEfficiency);
+                        efficiencies[upgrade.WorkerID] = Math.Max(eff, upgrade.NewEfficiency);
                     }
                     else
                     {
-                        efficiencies.Add(upgrade.ParallelPathID,upgrade.NewEfficiency);
+                        efficiencies.Add(upgrade.WorkerID,upgrade.NewEfficiency);
                     }
                  
                 } 

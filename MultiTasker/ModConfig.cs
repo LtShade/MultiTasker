@@ -11,14 +11,14 @@ namespace MultiTasker
 
         public record ParallelRepairUpgrades
         {
-            public int ParallelPathID;
+            public int WorkerID;
             public string UpgradeID;
             public float BaseEfficiency;
         }
 
         public record ParallelEfficiencyUpgrades
         {
-            public int ParallelPathID;
+            public int WorkerID;
             public string UpgradeID;
             public float NewEfficiency;
         }
@@ -46,12 +46,12 @@ namespace MultiTasker
             Mod.Log.Debug?.Log("---Repair Bays---");
             foreach (var upgrade in this.RepairBays)
             {
-                Mod.Log.Debug?.Log($"path: {upgrade.ParallelPathID} | id: {upgrade.UpgradeID} | base: {upgrade.BaseEfficiency}");
+                Mod.Log.Debug?.Log($"path: {upgrade.WorkerID} | id: {upgrade.UpgradeID} | base: {upgrade.BaseEfficiency}");
             }
             Mod.Log.Debug?.Log("---Effic. Bays---");
             foreach (var upgrade in this.BayEfficiencies)
             {
-                Mod.Log.Debug?.Log($"path: {upgrade.ParallelPathID} | id: {upgrade.UpgradeID} | base: {upgrade.NewEfficiency}");
+                Mod.Log.Debug?.Log($"path: {upgrade.WorkerID} | id: {upgrade.UpgradeID} | base: {upgrade.NewEfficiency}");
             }
             Mod.Log.Info?.Log("=== MOD CONFIG END ===");
         }

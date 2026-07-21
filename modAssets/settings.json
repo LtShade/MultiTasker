@@ -2,17 +2,17 @@
     "RepairBays":
     [
         {
-            "ParallelPathID" : 0,
+            "WorkerID" : 0,
             "UpgradeID": "argo_mechBay1",
             "BaseEfficiency": 1
         },
         {
-            "ParallelPathID" : 1,
+            "WorkerID" : 1,
             "UpgradeID": "argo_mechBay2",
             "BaseEfficiency": 0.5
         },
         {
-            "ParallelPathID" : 2,
+            "WorkerID" : 2,
             "UpgradeID": "argo_mechBay3",
             "BaseEfficiency": 0.5
         }
@@ -20,12 +20,12 @@
     "BayEfficiencies":
     [
         {
-            "ParallelPathID" : 1,
+            "WorkerID" : 1,
             "UpgradeID": "argo_mechBay_automation1",
             "NewEfficiency": 1
         },
                 {
-            "ParallelPathID" : 2,
+            "WorkerID" : 2,
             "UpgradeID": "argo_mechBay_automation2",
             "NewEfficiency": 1
         }

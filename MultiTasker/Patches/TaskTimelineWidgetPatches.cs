@@ -19,30 +19,30 @@ namespace MultiTasker.Patches
 			List<SimWorkOrder> simQueue = new List<SimWorkOrder>();
 			List<SimWorkOrder> simOutput = new List<SimWorkOrder>();
 			TaskManagementElement tme = null;
+			
 			//Build sim queue
-			int simMLQIndex = 0;
 			foreach (WorkOrderEntry workOrder in ___Sim.MechLabQueue)
 			{
 				if(__instance.ActiveItems.TryGetValue(workOrder, out tme) && ___Sim.WorkOrderIsMechTech(workOrder.Type) && workOrder.GetRemainingCost() != 0)
 				{
 					SimWorkOrder simWorkOrder = new SimWorkOrder
 					{
-						GUID = workOrder.GUID,
+						//For some reason, GUIDs don't ALWAYS exist; this is a hack and I hate it.
+						GUID = $"{workOrder.GUID}{___Sim.MechLabQueue.IndexOf(workOrder)}",
 						elapsedDays =  0,
 						remainingCost = workOrder.GetRemainingCost(),
-						origIndex = simMLQIndex,
-						mechOrder = workOrder.Description
+						mechOrder = workOrder.Description,
+						origIndex = ___Sim.MechLabQueue.IndexOf(workOrder)
 					};
-					simMLQIndex++;
 					simQueue.Add(simWorkOrder);
 				}
 			}
-			//Bail if nothing to simulate
+
+ 			//Bail if nothing to simulate
 			if(simQueue.Count ==0)
 			{
 				return;
-			}
-
+			} 
 
 			//Build parallel working queues
 			Mod.Log.Debug.Log("== Building and Populating Initial Parallel Queues for Sim ==");
@@ -52,17 +52,11 @@ namespace MultiTasker.Patches
 			{
 				ParallelWorker queue = ParallelWorkerHelper.CreateParallelWorker(simQueue[i].GUID, simQueue[i].remainingCost, simQueue[i].origIndex, simQueue[i].mechOrder);
 				workerQueue.Add(queue);
-				Mod.Log.Debug.Log($"Pos: {i} | {queue.mechOrder} | {queue.remainingCost} | {efficiencies[i]}");
-			}
-			
-			foreach (var item in simQueue)
-			{
-				Mod.Log.Debug.Log($"\t{item.remainingCost}");
 			}
 			
 			Mod.Log.Debug.Log("== Simulation Begins ==");
 			//Simulation Loop.
-			bool hasWork = true;
+			bool hasWork = simQueue.Count > 0;
 			int parallelWorkers = workerQueue.Count;
 			int simElapsedDays = 0;
 			int nextIndex = parallelWorkers;
@@ -70,38 +64,33 @@ namespace MultiTasker.Patches
 			int mechTech = ___Sim.MechTechSkill;
 			while (hasWork)
 			{	
-				foreach (var item in workerQueue)
-				{
-					Mod.Log.Debug.Log($"\t\t{item.mechOrder} | Eff Cost{(int)Math.Ceiling(item.remainingCost / efficiencies[workerQueue.IndexOf(item)])}");
-				}
-				Mod.Log.Debug.Log($"\tMechTech: {mechTech}");
-				Mod.Log.Debug.Log("\tCheck Lowest");
+
 				//Find the lowest effective cost
 				int lowestEffCost = workerQueue.Min((ParallelWorker pW) => (int)Math.Ceiling(pW.remainingCost / efficiencies[workerQueue.IndexOf(pW)]));
 				int lowestDays = (int)Math.Ceiling((double)lowestEffCost / mechTech);
-				Mod.Log.Debug.Log($"\tLowest Days: {lowestDays}");
-				Mod.Log.Debug.Log($"\tLowest Cost: {lowestEffCost}");
-				Mod.Log.Debug.Log("\tParallel Queue Values");
+				
 				//Remove cost from active tasks
 				//timeElapsed check to remove double elapsed accounting during loop
 				bool timeElapsed = false;
 				foreach (var task in workerQueue)
 				{
+					
 					double workerEfficiency = efficiencies[workerQueue.IndexOf(task)];
-
-					Mod.Log.Debug.Log($"\tPreRemaining Cost: {task.remainingCost}");
-					Mod.Log.Debug.Log($"\tLowest Cost: {lowestEffCost}");
-					if(task.remainingCost <= lowestEffCost)
+					//Remember that paid cost is always some multiple of MechTech skill, thus lowestEffCost is not reliable as
+					//There are some remaining costs that are larger than lowestEffCost but still expired in the same number of days
+					int effectiveSpend = (int)Math.Ceiling(lowestDays*workerEfficiency*mechTech);
+					Mod.Log.Debug.Log($"\tWQ Loop: {task.mechOrder} | remain: {task.remainingCost} | low: {lowestEffCost} | mechtech {mechTech} | lowDays: {lowestDays} | eff: {workerEfficiency}");
+					if(task.remainingCost <= effectiveSpend)
 					{
 						simElapsedDays = timeElapsed ? simElapsedDays : simElapsedDays + lowestDays;
 						timeElapsed = true;
 						SimWorkOrder finishedTask = simQueue.Find((SimWorkOrder sWO)=> sWO.GUID == task.activeID);
 						finishedTask.elapsedDays = simElapsedDays;
-						Mod.Log.Debug.Log($"\tMech: {task.mechOrder} | Elapsed: {finishedTask.elapsedDays}");
+						finishedTask.origIndex = task.origIndex;
+						Mod.Log.Debug.Log($"\tPrep for Add:  {finishedTask.mechOrder} | Elapsed: {finishedTask.elapsedDays} | oIndex: {finishedTask.origIndex} | GUID: {finishedTask.GUID}");
 					}
-					//Remember that paid cost is always some multiple of MechTech skill, thus lowestEffCost is not reliable here.
-					task.remainingCost = task.remainingCost - (int)Math.Ceiling(lowestDays*workerEfficiency*mechTech);
-					Mod.Log.Debug.Log($"\tPostRemaining Cost: {task.remainingCost}");
+					
+					task.remainingCost = task.remainingCost - effectiveSpend;
 				}
 				
 				Mod.Log.Debug.Log("\tAdd to Output List");
@@ -110,12 +99,17 @@ namespace MultiTasker.Patches
 				{
 					SimWorkOrder finishedTask = simQueue.Find((SimWorkOrder sWO)=> sWO.GUID == task.activeID);
 					simOutput.Add(finishedTask);
+					Mod.Log.Debug.Log($"Finished: oIndex: {finishedTask.origIndex} | {finishedTask.mechOrder} | Rem. Cost: {finishedTask.remainingCost} | GUID: {finishedTask.GUID} | Days: {finishedTask.elapsedDays}");
 				}
+				
 				//Nuke the finished tasks
 				Mod.Log.Debug.Log("\tFlush Finished Tasks");
-				foreach (var item in workerQueue.Where(i=>i.remainingCost<=0))
+				if (Mod.Config.Debug)
 				{
-					Mod.Log.Debug.Log($"\tPopping Mech: {item.mechOrder} | {simElapsedDays}");
+					foreach (var item in workerQueue.Where(i=>i.remainingCost<=0))
+					{
+						Mod.Log.Debug.Log($"\tPopping Mech: {item.mechOrder} | {simElapsedDays} | oIndex {item.origIndex}");
+					}
 				}
 				workerQueue.RemoveAll((ParallelWorker pW)=>pW.remainingCost<=0);
 
@@ -126,6 +120,7 @@ namespace MultiTasker.Patches
 				{
 					if(nextIndex <= totalTasks && nextIndex < simQueue.Count)
 					{
+						Mod.Log.Debug.Log($"\tRefill Index: {simQueue[nextIndex].origIndex}");
 						ParallelWorker newTask = ParallelWorkerHelper.CreateParallelWorker(simQueue[nextIndex].GUID, simQueue[nextIndex].remainingCost,simQueue[nextIndex].origIndex, simQueue[nextIndex].mechOrder );
 						nextIndex++;
 						workerQueue.Add(newTask);
@@ -140,26 +135,41 @@ namespace MultiTasker.Patches
 					hasWork = false;
 				}
 			}
+			
+			if (Mod.Config.Debug)
+			{
+				Mod.Log.Debug.Log("== Checking Unsorted Simulation Output ==");
+				foreach (var item in simOutput)
+				{
+					Mod.Log.Debug.Log($"\t {item.origIndex} | {item.elapsedDays} | {item.mechOrder} | {item.GUID}");
+				}
+			}
 
 			//Correct any order issues caused by items finishing out of the initial sequence
 			List<SimWorkOrder> sortedSimOutput = simOutput.OrderBy((SimWorkOrder sWO)=> sWO.origIndex).ToList();
 
-			//Debug check sim output
-			Mod.Log.Debug.Log("== Checking Simulation Output ==");
-			Mod.Log.Debug.Log($"SimOutput: {sortedSimOutput.Count} | simQueue: {simQueue.Count}");
-			foreach (var item in sortedSimOutput)
+			if (Mod.Config.Debug)
 			{
-				Mod.Log.Debug.Log($"\t {item.origIndex} | {item.elapsedDays}");
+				Mod.Log.Debug.Log("== Checking Sorted Simulation Output ==");
+				foreach (var item in sortedSimOutput)
+				{
+					Mod.Log.Debug.Log($"\t {item.origIndex} | {item.elapsedDays} | {item.mechOrder} | {item.GUID}");
+				}
 			}
 
-
+			Mod.Log.Debug.Log($"== Sim MLQ Count: {___Sim.MechLabQueue.Count} ==");
+			
 			//Take simulation output and update Task TimelineWidget
-			foreach (WorkOrderEntry workOrder in ___Sim.MechLabQueue)
+			foreach (SimWorkOrder sWO in sortedSimOutput)
 			{
+				Mod.Log.Trace.Log($"\t Widget Update Loop {sWO.origIndex}");
 				tme = null;
+				WorkOrderEntry workOrder = ___Sim.MechLabQueue.Find((WorkOrderEntry wOE)=> $"{wOE.GUID}{sWO.origIndex}"==sWO.GUID && wOE.Description == sWO.mechOrder);
+				Mod.Log.Trace.Log($"\t\t ID {workOrder.ID} | {workOrder.Description} | GUID {workOrder.GUID}");
+				//Update Task values
 				if(__instance.ActiveItems.TryGetValue(workOrder, out tme) && ___Sim.WorkOrderIsMechTech(workOrder.Type))
 				{
-					int simIndex = sortedSimOutput.FindIndex((SimWorkOrder sWO) => sWO.GUID == workOrder.GUID);
+					int simIndex = sWO.origIndex;
 					SimWorkOrder activeWO = sortedSimOutput[simIndex];
 					int effIndex = simIndex < parallelWorkers ? simIndex : 0;
 					float eff = efficiencies[effIndex];
@@ -176,6 +186,7 @@ namespace MultiTasker.Patches
 						tme.subTitleText.SetText($"Waiting for Open Bay"); 
 					}
 				}
+
 			}
 
 			Mod.Log.Debug.Log("=== Ending Work Time Estimates ===");	
